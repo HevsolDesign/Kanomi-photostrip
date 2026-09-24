@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kanomi Photostrip</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 20px 14px 40px;
+  background: #eef4ff;
+  font-family: Arial, sans-serif;
+  color: #172548;
+}
+
+.container {
+  max-width: 620px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  margin: 10px 0 6px;
+  font-size: 30px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #64708a;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: white;
+  border-radius: 28px;
+  padding: 22px;
+  margin-bottom: 22px;
+  box-shadow: 0 8px 25px rgba(30,50,90,.08);
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.uploads {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.upload-box {
+  border: 2px dashed #bdcbe0;
+  border-radius: 20px;
+  padding: 18px 10px;
+  text-align: center;
+}
+
+.upload-box label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+input[type="file"] {
+  width: 100%;
+  font-size: 12px;
+}
+
+button {
+  width: 100%;
+  border: 0;
+  border-radius: 18px;
+  padding: 17px;
+  margin-top: 18px;
+  background: #202f62;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+button:active {
+  transform: scale(.98);
+}
+
+#preview {
+  width: 100%;
+  max-width: 320px;
+  margin: 10px auto 0;
+  display: block;
+  background: white;
+}
+
+#download {
+  display: none;
+  text-align: center;
+  text-decoration: none;
+  background: #f4c62f;
+  color: #172548;
+  padding: 16px;
+  border-radius: 18px;
+  margin-top: 15px;
+  font-weight: bold;
+}
+
+canvas {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>📸 KANOMI ✦ PHOTOSTRIP</h1>
+
+  <div class="subtitle">
+    Buat photostrip kamu sendiri
+  </div>
+
+  <div class="card">
+
+    <h2>📸 Buat photostrip</h2>
+
+    <p>
+      Upload 2 foto. Foto akan ditempatkan ke frame Kanomi.
+    </p>
+
+    <div class="uploads">
+
+      <div class="upload-box">
+        <label>Foto 1</label>
+        <input id="photo1" type="file" accept="image/*">
+      </div>
+
+      <div class="upload-box">
+        <label>Foto 2</label>
+        <input id="photo2" type="file" accept="image/*">
+      </div>
+
+    </div>
+
+    <button onclick="makeStrip()">
+      BUAT PHOTOSTRIP
+    </button>
+
+  </div>
+
+  <div class="card">
+
+    <h2>Preview</h2>
+
+    <canvas id="canvas" width="192" height="576"></canvas>
+
+    <img id="preview">
+
+    <a id="download" download="kanomi-photostrip.png">
+      ⬇️ DOWNLOAD PHOTOSTRIP
+    </a>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const FRAME =
+"Shatter_20260924_101925_0000.png";
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+function loadImage(file) {
+  return new Promise((resolve, reject) => {
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+
+      const img = new Image();
+
+      img.onload = () => resolve(img);
+
+      img.onerror = reject;
+
+      img.src = reader.result;
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+}
+
+
+function drawCover(img, x, y, w, h) {
+
+  const scale =
